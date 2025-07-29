@@ -1,1990 +1,436 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hira Foods AI Assistant</title>
-    <style>
-        :root {
-            --hira-green: #3A5D23;
-            --hira-gold: #C9A13B;
-            --hira-beige: #F9F6F2;
-            --hira-brown: #4A2C18;
-            --bubble-radius: 18px;
-        }
-        html, body {
-            height: 100%;
-        }
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--hira-beige) 60%, var(--hira-gold) 100%);
-            font-family: 'Segoe UI', 'Tahoma', Geneva, Verdana, sans-serif;
-            color: var(--hira-brown);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-        }
-        .chat-container {
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 6px 24px rgba(58, 93, 35, 0.12);
-            width: 100%;
-            max-width: 420px;
-            height: 600px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border: 2px solid var(--hira-gold);
-        }
-        .chat-header {
-            background: var(--hira-green);
-            color: var(--hira-gold);
-            padding: 18px 0 12px 0;
-            text-align: center;
-            border-bottom: 2px solid var(--hira-gold);
-        }
-        .chat-header h1 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 2px;
-            letter-spacing: 1px;
-        }
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--hira-beige);
-        }
-        .online-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background-color: #8BC34A;
-            border: 2px solid var(--hira-gold);
-        }
-        .chat-messages {
-            flex: 1;
-            padding: 18px 14px;
-            overflow-y: auto;
-            background: var(--hira-beige);
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-        .message {
-            padding: 12px 16px;
-            border-radius: var(--bubble-radius);
-            max-width: 85%;
-            word-wrap: break-word;
-            font-size: 15px;
-            position: relative;
-            box-shadow: 0 1px 4px rgba(58, 93, 35, 0.07);
-        }
-        .user-message {
-            background: var(--hira-gold);
-            color: var(--hira-brown);
-            margin-left: auto;
-            border-bottom-right-radius: 4px;
-            text-align: right;
-        }
-        .ai-message {
-            background: #fff;
-            color: var(--hira-green);
-            border: 1px solid #e9ecef;
-            margin-right: auto;
-            border-bottom-left-radius: 4px;
-            text-align: left;
-        }
-        .ai-message.rtl {
-            text-align: right;
-            direction: rtl;
-        }
-        .chat-input-container {
-            padding: 14px;
-            background: #fff;
-            border-top: 2px solid var(--hira-gold);
-        }
-        .input-group {
-            display: flex;
-            gap: 8px;
-            align-items: flex-end;
-        }
-        #promptInput {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid #e9ecef;
-            border-radius: 20px;
-            font-size: 15px;
-            resize: none;
-            min-height: 40px;
-            max-height: 100px;
-            outline: none;
-            background: var(--hira-beige);
-            color: var(--hira-brown);
-        }
-        #promptInput::placeholder {
-            color: #999;
-            text-align: center;
-        }
-        #promptInput:focus {
-            border-color: var(--hira-gold);
-            background: #fff;
-        }
-        #sendButton {
-            background: var(--hira-green);
-            color: var(--hira-gold);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #sendButton:hover:not(:disabled) {
-            background: #2e471b;
-        }
-        #sendButton:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .typing-indicator {
-            display: none;
-            padding: 10px 14px;
-            margin-bottom: 12px;
-            border-radius: var(--bubble-radius);
-            background: #fff;
-            border: 1px solid #e9ecef;
-            max-width: 80%;
-            margin-right: auto;
-        }
-        .typing-indicator.active {
-            display: block;
-        }
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-        }
-        .typing-dots span {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background-color: var(--hira-gold);
-            animation: typing 1.4s infinite ease-in-out;
-        }
-        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-        @media (max-width: 600px) {
-            .chat-container {
-                height: 100vh;
-                border-radius: 0;
-                max-width: 100%;
-            }
-            .message {
-                max-width: 94%;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h1>Hira Foods AI Assistant</h1>
-            <div class="status-indicator">
-                <div class="online-dot"></div>
-                <span>Online</span>
-            </div>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="ai-message message">
-                Welcome! How can I help you with Hira Foods today?<br>
-                <span style="font-size:12px;color:#C9A13B;">(You may ask in English or Norwegian)</span>
-            </div>
-        </div>
-        <div class="typing-indicator" id="typingIndicator">
-            <div class="typing-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-        <div class="chat-input-container">
-            <div class="input-group">
-                <textarea 
-                    id="promptInput" 
-                    rows="1"
-                    placeholder="Type your message in English or Norwegian..."
-                ></textarea>
-                <button id="sendButton">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-    <script>
-        // Change this to your Flask API endpoint if needed
-        const API_URL = 'https://hinabackend-production.up.railway.app/api/prompt';
-
-
-        const chatMessages = document.getElementById('chatMessages');
-        const promptInput = document.getElementById('promptInput');
-        const sendButton = document.getElementById('sendButton');
-        const typingIndicator = document.getElementById('typingIndicator');
-        const messagesEndRef = document.createElement('div');
-
-        // Auto-resize textarea
-        promptInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-        });
-
-        // Send message on Enter (but allow Shift+Enter for new line)
-        promptInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit();
-            }
-        });
-
-        sendButton.addEventListener('click', handleSubmit);
-
-        function cleanEnglishText(text) {
-            text = text.replace(/\*\*/g, '');
-            text = text.replace(/\*/g, '');
-            text = text.replace(/_/g, '');
-            text = text.replace(/`/g, '');
-            text = text.replace(/#/g, '');
-            text = text.replace(/^#+\s+/gm, '');
-            text = text.replace(/^\d+\.\s+/gm, '• ');
-            text = text.replace(/\n{3,}/g, '\n\n');
-            return text.trim();
-        }
-
-        function createMessage(content, isUser = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
-            const isNorwegian = /[æøåÆØÅ]/.test(content);
-            if (!isUser && isNorwegian) messageDiv.classList.add('rtl');
-            messageDiv.innerHTML = content.replace(/\n/g, '<br>');
-            chatMessages.appendChild(messageDiv);
-            chatMessages.appendChild(messagesEndRef);
-            messagesEndRef.scrollIntoView({ behavior: 'smooth' });
-            return messageDiv;
-        }
-
-        function showTyping() {
-            typingIndicator.classList.add('active');
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function hideTyping() {
-            typingIndicator.classList.remove('active');
-        }
-
-        async function handleSubmit() {
-            const prompt = promptInput.value.trim();
-            if (!prompt) return;
-
-            createMessage(prompt, true);
-
-            promptInput.value = '';
-            promptInput.style.height = 'auto';
-            sendButton.disabled = true;
-            sendButton.innerHTML = `<span style="font-size:18px;">...</span>`;
-            showTyping();
-
-            try {
-                let tmpPromptResponse = '';
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
-                });
-
-                if (!response.body) throw new Error('No response body');
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-
-                const aiMessageDiv = document.createElement('div');
-                aiMessageDiv.className = 'message ai-message';
-                chatMessages.appendChild(aiMessageDiv);
-
-                while (true) {
-                    const { value, done } = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value, { stream: true });
-                    tmpPromptResponse += chunk;
-                    aiMessageDiv.innerHTML = tmpPromptResponse.replace(/\n/g, '<br>');
-                    messagesEndRef.scrollIntoView({ behavior: 'smooth' });
-                }
-
-            } catch (error) {
-                createMessage('Sorry, there was an error connecting to the server.');
-            } finally {
-                sendButton.disabled = false;
-                sendButton.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>`;
-                hideTyping();
-                promptInput.focus();
-            }
-        }
-
-        window.addEventListener('load', () => { promptInput.focus(); });
-    </script>
-</body>
-</html>
-
- -->
-
-<!-- 
- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hira Foods AI Assistant</title>
-    <style>
-        :root {
-            --hira-green: #3A5D23;
-            --hira-gold: #C9A13B;
-            --hira-beige: #F9F6F2;
-            --hira-brown: #4A2C18;
-            --bubble-radius: 18px;
-        }
-        html, body {
-            height: 100%;
-        }
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--hira-beige) 60%, var(--hira-gold) 100%);
-            font-family: 'Segoe UI', 'Tahoma', Geneva, Verdana, sans-serif;
-            color: var(--hira-brown);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-        }
-        .chat-container {
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 6px 24px rgba(58, 93, 35, 0.12);
-            width: 100%;
-            max-width: 420px;
-            height: 600px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border: 2px solid var(--hira-gold);
-        }
-        .chat-header {
-            background: var(--hira-green);
-            color: var(--hira-gold);
-            padding: 18px 0 12px 0;
-            text-align: center;
-            border-bottom: 2px solid var(--hira-gold);
-        }
-        .chat-header h1 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 2px;
-            letter-spacing: 1px;
-        }
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--hira-beige);
-        }
-        .online-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background-color: #8BC34A;
-            border: 2px solid var(--hira-gold);
-        }
-        .chat-messages {
-            flex: 1;
-            padding: 18px 14px;
-            overflow-y: auto;
-            background: var(--hira-beige);
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-        .message {
-            padding: 12px 16px;
-            border-radius: var(--bubble-radius);
-            max-width: 85%;
-            word-wrap: break-word;
-            font-size: 15px;
-            position: relative;
-            box-shadow: 0 1px 4px rgba(58, 93, 35, 0.07);
-        }
-        .user-message {
-            background: var(--hira-gold);
-            color: var(--hira-brown);
-            margin-left: auto;
-            border-bottom-right-radius: 4px;
-            text-align: right;
-        }
-        .ai-message {
-            background: #fff;
-            color: var(--hira-green);
-            border: 1px solid #e9ecef;
-            margin-right: auto;
-            border-bottom-left-radius: 4px;
-            text-align: left;
-        }
-        .ai-message.rtl {
-            text-align: right;
-            direction: rtl;
-        }
-        .chat-input-container {
-            padding: 14px;
-            background: #fff;
-            border-top: 2px solid var(--hira-gold);
-        }
-        .input-group {
-            display: flex;
-            gap: 8px;
-            align-items: flex-end;
-        }
-        #promptInput {
-            flex: 1;
-            padding: 10px 14px;
-            border: 1px solid #e9ecef;
-            border-radius: 20px;
-            font-size: 15px;
-            resize: none;
-            min-height: 40px;
-            max-height: 100px;
-            outline: none;
-            background: var(--hira-beige);
-            color: var(--hira-brown);
-        }
-        #promptInput::placeholder {
-            color: #999;
-            text-align: center;
-        }
-        #promptInput:focus {
-            border-color: var(--hira-gold);
-            background: #fff;
-        }
-        #sendButton {
-            background: var(--hira-green);
-            color: var(--hira-gold);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #sendButton:hover:not(:disabled) {
-            background: #2e471b;
-        }
-        #sendButton:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .typing-indicator {
-            display: none;
-            padding: 10px 14px;
-            margin-bottom: 12px;
-            border-radius: var(--bubble-radius);
-            background: #fff;
-            border: 1px solid #e9ecef;
-            max-width: 80%;
-            margin-right: auto;
-        }
-        .typing-indicator.active {
-            display: block;
-        }
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-        }
-        .typing-dots span {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background-color: var(--hira-gold);
-            animation: typing 1.4s infinite ease-in-out;
-        }
-        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-        @media (max-width: 600px) {
-            .chat-container {
-                height: 100vh;
-                border-radius: 0;
-                max-width: 100%;
-            }
-            .message {
-                max-width: 94%;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h1>Hira Foods AI Assistant</h1>
-            <div class="status-indicator">
-                <div class="online-dot"></div>
-                <span>Online</span>
-            </div>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="ai-message message">
-                Welcome! How can I help you with Hira Foods today?<br>
-                <span style="font-size:12px;color:#C9A13B;">(You may ask in English or Norwegian)</span>
-            </div>
-        </div>
-        <div class="typing-indicator" id="typingIndicator">
-            <div class="typing-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-        <div class="chat-input-container">
-            <div class="input-group">
-                <textarea 
-                    id="promptInput" 
-                    rows="1"
-                    placeholder="Type your message in English or Norwegian..."
-                ></textarea>
-                <button id="sendButton">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-    <script>
-        // Change this to your Flask API endpoint if needed
-        const API_URL = 'https://hinabackend-production.up.railway.app/api/prompt';
-
-
-        const chatMessages = document.getElementById('chatMessages');
-        const promptInput = document.getElementById('promptInput');
-        const sendButton = document.getElementById('sendButton');
-        const typingIndicator = document.getElementById('typingIndicator');
-        const messagesEndRef = document.createElement('div');
-
-        // Auto-resize textarea
-        promptInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-        });
-
-        // Send message on Enter (but allow Shift+Enter for new line)
-        promptInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit();
-            }
-        });
-
-        sendButton.addEventListener('click', handleSubmit);
-
-        function cleanEnglishText(text) {
-            text = text.replace(/\*\*/g, '');
-            text = text.replace(/\*/g, '');
-            text = text.replace(/_/g, '');
-            text = text.replace(/`/g, '');
-            text = text.replace(/#/g, '');
-            text = text.replace(/^#+\s+/gm, '');
-            text = text.replace(/^\d+\.\s+/gm, '• ');
-            text = text.replace(/\n{3,}/g, '\n\n');
-            return text.trim();
-        }
-
-        function createMessage(content, isUser = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
-            const isNorwegian = /[æøåÆØÅ]/.test(content);
-            if (!isUser && isNorwegian) messageDiv.classList.add('rtl');
-            messageDiv.innerHTML = content.replace(/\n/g, '<br>');
-            chatMessages.appendChild(messageDiv);
-            chatMessages.appendChild(messagesEndRef);
-            messagesEndRef.scrollIntoView({ behavior: 'smooth' });
-            return messageDiv;
-        }
-
-        function showTyping() {
-            typingIndicator.classList.add('active');
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function hideTyping() {
-            typingIndicator.classList.remove('active');
-        }
-
-        async function handleSubmit() {
-            const prompt = promptInput.value.trim();
-            if (!prompt) return;
-
-            createMessage(prompt, true);
-
-            promptInput.value = '';
-            promptInput.style.height = 'auto';
-            sendButton.disabled = true;
-            sendButton.innerHTML = `<span style="font-size:18px;">...</span>`;
-            showTyping();
-
-            try {
-                let tmpPromptResponse = '';
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
-                });
-
-                if (!response.body) throw new Error('No response body');
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-
-                const aiMessageDiv = document.createElement('div');
-                aiMessageDiv.className = 'message ai-message';
-                chatMessages.appendChild(aiMessageDiv);
-
-                while (true) {
-                    const { value, done } = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value, { stream: true });
-                    tmpPromptResponse += chunk;
-                    aiMessageDiv.innerHTML = tmpPromptResponse.replace(/\n/g, '<br>');
-                    messagesEndRef.scrollIntoView({ behavior: 'smooth' });
-                }
-
-            } catch (error) {
-                createMessage('Sorry, there was an error connecting to the server.');
-            } finally {
-                sendButton.disabled = false;
-                sendButton.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>`;
-                hideTyping();
-                promptInput.focus();
-            }
-        }
-
-        window.addEventListener('load', () => { promptInput.focus(); });
-    </script>
-</body>
-</html>
- -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>TheHealthSpace AI Assistant</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
 :root {
---webring-yellow: #727B97;
---webring-black: #222;
---webring-bg: #F4F4F4;
---webring-gray: #555;
---user-bubble-bg: #FFF9C4;
---bot-bubble-bg: #222;
---bot-bubble-color: #fff;
---border-radius: 18px;
+  --webring-yellow: #727B97;
+  --webring-black: #222;
+  --webring-bg: #F4F4F4;
+  --webring-gray: #555;
+  --user-bubble-bg: #FFF9C4;
+  --bot-bubble-bg: #222;
+  --bot-bubble-color: #fff;
+  --border-radius: 18px;
 }
-html, body {height: 100%; }
+html, body { height: 100%; margin: 0; }
 body {
-min-height: 100vh;
-background: var(--webring-bg);
-font-family: 'Segoe UI', 'Tahoma', Geneva, Verdana, sans-serif;
-color: var(--webring-black);
-display: flex;
-align-items: center;
-justify-content: center;
+  min-height: 100vh;
+  background: var(--webring-bg);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--webring-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .chat-container {
-background: #fff;
-box-shadow: 0 6px 24px rgba(58,93,35,0.09);
-width: 100%;
-max-width: 410px;
-height: 600px;
-display: flex;
-flex-direction: column;
-/* border: 1.5px solid  var(--bot-bubble-bg); */
-overflow: hidden;
+  background: #fff;
+  box-shadow: 0 6px 24px rgba(58,93,35,0.09);
+  width: 100%;
+  max-width: 410px;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .chat-header {
-background: var(--webring-yellow);
-color: var(--webring-black);
-padding: 14px 0 10px 0;
-text-align: left;
-border-bottom: 1.5px solid #fffbe5;
-font-weight: 700;
-letter-spacing: 0.5px;
-display: flex;
-align-items: center;
-position: relative;
+  background: var(--webring-yellow);
+  color: var(--webring-black);
+  padding: 14px 0 10px 0;
+  text-align: left;
+  border-bottom: 1.5px solid #fffbe5;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 .chat-header h1 {
-font-size: 20px;
-font-weight: 700;
-padding-left: 22px;
-margin: 0;
-flex: 1;
-user-select: none;
-color: white; 
+  font-size: 20px;
+  font-weight: 700;
+  padding-left: 22px;
+  margin: 0;
+  flex: 1;
+  user-select: none;
+  color: white;
 }
 .chat-header .close {
-position: absolute;
-right: 13px; top: 13px;
-font-size: 23px;
-color: #666;
-background: none;
-border: none;
-cursor: pointer;
+  position: absolute;
+  right: 45px;
+  top: 13px;
+  font-size: 23px;
+  color: #666;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.chat-header .reset {
+  position: absolute;
+  right: 13px;
+  top: 13px;
+  font-size: 14px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 14px;
+  background: #444;
+  color: white;
+  cursor: pointer;
+  user-select: none;
 }
 .chat-messages {
-flex: 1;
-padding: 20px 14px;
-overflow-y: auto;
-background: #fff;
-display: flex;
-flex-direction: column;
+  flex: 1;
+  padding: 20px 14px;
+  overflow-y: auto;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
 }
 .message-row {
-display: flex;
-align-items: flex-end;
-margin-bottom: 8px;
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 8px;
 }
 .avatar {
-width: 36px; height: 36px;
-border-radius: 50%;
-background: #ddd;
-margin-right: 7px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ddd;
+  margin-right: 7px;
 }
 .avatar.user {
-margin-left: 7px; margin-right: 0;
+  margin-left: 7px;
+  margin-right: 0;
 }
 .message {
-padding: 13px 18px;
-border-radius: var(--border-radius);
-max-width: 77%;
-font-size: 15px;
-word-break: break-word;
-box-shadow: 0 1px 4px rgba(34,34,34,0.06);
-line-height: 1.55;
+  padding: 13px 18px;
+  border-radius: var(--border-radius);
+  max-width: 77%;
+  font-size: 15px;
+  word-break: break-word;
+  box-shadow: 0 1px 4px rgba(34,34,34,0.06);
+  line-height: 1.55;
 }
 .message.bot {
-background: var(--bot-bubble-bg);
-color: var(--bot-bubble-color);
-margin-right: auto;
-border-bottom-left-radius: 6px;
+  background: var(--bot-bubble-bg);
+  color: var(--bot-bubble-color);
+  margin-right: auto;
+  border-bottom-left-radius: 6px;
 }
 .message.user {
-background: var(--user-bubble-bg);
-color: var(--webring-black);
-margin-left: auto;
-border-bottom-right-radius: 6px;
-text-align: right;
+  background: var(--user-bubble-bg);
+  color: var(--webring-black);
+  margin-left: auto;
+  border-bottom-right-radius: 6px;
+  text-align: right;
 }
 .message-meta {
-font-size: 12px; color: #999;
-margin-top: 3px;
-margin-bottom: 0;
-padding: 0 4px;
+  font-size: 12px;
+  color: #999;
+  margin-top: 3px;
+  margin-bottom: 0;
+  padding: 0 4px;
 }
 .typing-indicator {
-display: none;
-padding: 9px 14px;
-margin-bottom: 10px;
-border-radius: var(--border-radius);
-background: #f8f8f8;
-border: 1px solid #eee;
-color: #888;
-margin-right: auto;
-margin-left: 0;
-font-size: 14px;
+  display: none;
+  padding: 9px 14px;
+  margin-bottom: 10px;
+  border-radius: var(--border-radius);
+  background: #f8f8f8;
+  border: 1px solid #eee;
+  color: #888;
+  margin-right: auto;
+  margin-left: 0;
+  font-size: 14px;
 }
 .typing-indicator.active {
-display: inline-block;
+  display: inline-block;
 }
 .chat-input-container {
-padding: 10px 12px;
-background: #fff;
-border-top: 1.5px solid var(--webring-yellow);
-background: var(--bot-bubble-bg);
+  padding: 10px 12px;
+  background: var(--bot-bubble-bg);
 }
 .input-group {
-display: flex;
-gap: 8px;
-align-items: flex-end;
-background: var(--bot-bubble-bg);
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  background: var(--bot-bubble-bg);
 }
 #promptInput {
-flex: 1;
-padding: 12px 16px;
-border: 1.5px solid #ececec;
-border-radius: 20px;
-font-size: 15px;
-min-height: 20px;
-max-height: 20px;
-outline: none;
-background: #f8f8f8;
-color: var(--webring-black);
-resize: none;
-transition: border 0.18s, background 0.15s;
+  flex: 1;
+  padding: 12px 16px;
+  border: 1.5px solid #ececec;
+  border-radius: 20px;
+  font-size: 15px;
+  min-height: 20px;
+  max-height: 80px;
+  outline: none;
+  background: #f8f8f8;
+  color: var(--webring-black);
+  resize: none;
+  transition: border 0.18s, background 0.15s;
 }
 #promptInput::placeholder {
-color: #979797;
+  color: #979797;
 }
 #promptInput:focus {
-border-color: var(--webring-yellow);
-background: #fffbe5;
+  border-color: var(--webring-yellow);
+  background: #fffbe5;
 }
 #sendButton {
-background: var(--webring-yellow);
-color: var(--webring-black);
-border: none;
-padding: 12px 19px;
-border-radius: 20px;
-cursor: pointer;
-font-size: 17px;
-font-weight: 600;
-transition: background 0.18s, color 0.18s;
-display: flex;
-align-items: center;
-box-shadow: 0 2px 8px rgba(58,93,35,0.06);
+  background: var(--webring-yellow);
+  color: var(--webring-black);
+  border: none;
+  padding: 12px 19px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(58,93,35,0.06);
 }
 #sendButton:disabled {
-opacity: 0.5;
-cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 #sendButton:hover:not(:disabled),
 #sendButton:focus:not(:disabled) {
-background: #ffec80;
-color: #111;
+  background: #ffec80;
+  color: #111;
 }
 @media (max-width: 650px) {
-.chat-container { height: 100vh; border-radius: 0; max-width: 100%; }
-.message { max-width: 90vw; }
+  .chat-container { height: 100vh; border-radius: 0; max-width: 100%; }
+  .message { max-width: 90vw; }
 }
 </style>
 </head>
 <body>
-<div class="chat-container">
-<div class="chat-header">
-<h1>TheHealthSpace AI Assistant</h1>
-<button class="close" title="Close" onclick="window.location.reload()">&times;</button>
-</div>
+<div class="chat-container" role="main" aria-label="Chat container">
+  <div class="chat-header" role="banner">
+    <h1>TheHealthSpace AI Assistant</h1>
+    <button class="close" title="Reload Page" aria-label="Reload chat window" onclick="window.location.reload()">&times;</button>
+    <button class="reset" title="Reset Chat" aria-label="Reset chat history" id="resetButton">Reset Chat</button>
+  </div>
 
-<div class="chat-messages" id="chatMessages"></div>
-<div class="typing-indicator" id="typingIndicator">
-TheHealthSpace Bot is typing...
-</div>
-<div class="chat-input-container">
-<div class="input-group">
-<textarea
-id="promptInput"
-rows="1"
-placeholder="Type your message here..."
-autocomplete="off"
-></textarea>
-<button id="sendButton" aria-label="Send">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-<path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-<path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</button>
-</div>
-</div>
+  <div class="chat-messages" id="chatMessages" aria-live="polite" aria-atomic="false"></div>
+
+  <div class="typing-indicator" id="typingIndicator" aria-live="assertive" aria-atomic="true">
+    TheHealthSpace Bot is typing...
+  </div>
+
+  <div class="chat-input-container" role="form" aria-label="Chat input form">
+    <div class="input-group">
+      <textarea id="promptInput" rows="1" placeholder="Type your message here..." autocomplete="off" aria-label="Type your message"></textarea>
+      <button id="sendButton" aria-label="Send message" title="Send message" disabled>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+          <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
 </div>
 <script>
-const API_URL = 'https://web-production-56b6.up.railway.app/chat'; // Set to your Flask backend endpoint
+const API_URL = 'https://web-production-56b6.up.railway.app/chat'; // Replace with your backend URL
 const BOT_AVATAR = "https://img.icons8.com/color/96/robot.png";
 const USER_AVATAR = "https://img.icons8.com/ios-glyphs/60/000000/user--v1.png";
-// Example: General user icon from Icons8
-
 
 const chatMessages = document.getElementById('chatMessages');
 const promptInput = document.getElementById('promptInput');
 const sendButton = document.getElementById('sendButton');
 const typingIndicator = document.getElementById('typingIndicator');
-const messagesEndRef = document.createElement('div'); // for auto-scroll
+const resetButton = document.getElementById('resetButton');
 
-let isFirstMessage = true;
+let sessionMessages = []; // Will hold the conversation for UI persistence
 
+// Load previous messages from sessionStorage
+function loadMessagesFromStorage() {
+  try {
+    const saved = sessionStorage.getItem('chatMessages');
+    if (saved) {
+      sessionMessages = JSON.parse(saved);
+      sessionMessages.forEach(msg => {
+        createMessage(msg.content, msg.isUser);
+      });
+      scrollToBottom();
+    }
+  } catch {
+    sessionMessages = [];
+  }
+}
+
+// Save messages to sessionStorage
+function saveMessagesToStorage() {
+  sessionStorage.setItem('chatMessages', JSON.stringify(sessionMessages));
+}
+
+// Create and append message to chat UI
 function createMessage(content, isUser = false, metaText = "") {
-const msgRow = document.createElement('div');
-msgRow.className = 'message-row';
-// Avatar
-const avatar = document.createElement('img');
-avatar.className = 'avatar' + (isUser ? ' user' : '');
-avatar.src = isUser ? USER_AVATAR : BOT_AVATAR;
-avatar.alt = isUser ? "You" : "Bot";
-avatar.loading = "lazy";
-avatar.width = 36; avatar.height = 36;
+  const msgRow = document.createElement('div');
+  msgRow.className = 'message-row';
+  // Avatar
+  const avatar = document.createElement('img');
+  avatar.className = 'avatar' + (isUser ? ' user' : '');
+  avatar.src = isUser ? USER_AVATAR : BOT_AVATAR;
+  avatar.alt = isUser ? "You" : "Bot";
+  avatar.loading = "lazy";
+  avatar.width = 36; avatar.height = 36;
 
-// Message bubble
-const msgDiv = document.createElement('div');
-msgDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-msgDiv.innerHTML = content.replace(/\n/g, "<br>");
+  // Message bubble
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+  msgDiv.innerHTML = content.replace(/\n/g, "<br>");
 
-if (isUser) {
-msgRow.appendChild(msgDiv);
-msgRow.appendChild(avatar);
-} else {
-msgRow.appendChild(avatar);
-msgRow.appendChild(msgDiv);
+  if (isUser) {
+    msgRow.appendChild(msgDiv);
+    msgRow.appendChild(avatar);
+  } else {
+    msgRow.appendChild(avatar);
+    msgRow.appendChild(msgDiv);
+  }
+
+  chatMessages.appendChild(msgRow);
+
+  // Meta (optional)
+  if (metaText) {
+    const meta = document.createElement('div');
+    meta.className = 'message-meta';
+    meta.innerText = metaText;
+    msgRow.appendChild(meta);
+  }
+
+  scrollToBottom();
+  return msgRow;
 }
 
-chatMessages.appendChild(msgRow);
-
-// Meta (timestamp)
-if (metaText) {
-const meta = document.createElement('div');
-meta.className = 'message-meta';
-meta.innerText = metaText;
-msgRow.appendChild(meta);
+function scrollToBottom() {
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-chatMessages.appendChild(messagesEndRef);
-messagesEndRef.scrollIntoView({ behavior: 'smooth' });
-return msgRow;
-}
-
+// Show typing indicator
 function showTyping() {
-typingIndicator.style.display = 'block';
-chatMessages.scrollTop = chatMessages.scrollHeight;
+  typingIndicator.classList.add('active');
+  scrollToBottom();
 }
+// Hide typing indicator
 function hideTyping() {
-typingIndicator.style.display = 'none';
+  typingIndicator.classList.remove('active');
 }
 
-function getCurrentDate() {
-const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
-return new Date().toLocaleDateString(undefined, options);
+// Enable or disable send button based on input content
+function toggleSendButton() {
+  sendButton.disabled = !promptInput.value.trim().length;
 }
 
-// Initial welcome message
-window.addEventListener('DOMContentLoaded', () => {
-// Show date line
-const dateRow = document.createElement('div');
-dateRow.style.textAlign = "center";
-dateRow.style.margin = "10px 0 15px 0";
-dateRow.style.color = "#bbb";
-dateRow.style.fontSize = "13px";
-dateRow.innerText = getCurrentDate();
-chatMessages.appendChild(dateRow);
-
+promptInput.addEventListener('input', () => {
+  // Auto-expand text area height, max 80px (about 4 lines)
+  promptInput.style.height = 'auto';
+  promptInput.style.height = Math.min(promptInput.scrollHeight, 80) + 'px';
+  toggleSendButton();
 });
 
-promptInput.addEventListener('input', function() {
-this.style.height = 'auto';
-this.style.height = Math.min(this.scrollHeight, 80) + 'px';
-});
-
-promptInput.addEventListener('keydown', function(e) {
-if (e.key === 'Enter' && !e.shiftKey) {
-e.preventDefault();
-handleSubmit();
-}
-});
-sendButton.addEventListener('click', handleSubmit);
-
-async function handleSubmit() {
-const prompt = promptInput.value.trim();
-if (!prompt) return;
-createMessage(prompt, true);
-promptInput.value = '';
-promptInput.style.height = 'auto';
-sendButton.disabled = true;
-showTyping();
-
-try {
-const response = await fetch(API_URL, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ message: prompt })
-});
-
-const data = await response.json();
-// Show bot response
-createMessage(data.response, false);
-
-} catch (error) {
-createMessage('Sorry, there was an error connecting to the server.', false);
-} finally {
-sendButton.disabled = false;
-hideTyping();
-promptInput.focus();
-}
-}
-</script>
-</body>
-</html>
-
-<!-- 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Hira Foods AI Assistant</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        :root {
-            --hira-green: #3A5D23;
-            --hira-gold: #C9A13B;
-            --hira-beige: #F9F6F2;
-            --hira-brown: #4A2C18;
-            --bubble-radius: 18px;
-        }
-        html, body { height: 100%; }
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--hira-beige) 60%, var(--hira-gold) 100%);
-            font-family: 'Segoe UI', 'Tahoma', Geneva, Verdana, sans-serif;
-            color: var(--hira-brown);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-        }
-        .chat-container {
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 6px 24px rgba(58, 93, 35, 0.12);
-            width: 100%;
-            max-width: 420px;
-            height: 600px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border: 2px solid var(--hira-gold);
-        }
-        .chat-header {
-            background: var(--hira-green);
-            color: var(--hira-gold);
-            padding: 18px 0 12px 0;
-            text-align: center;
-            border-bottom: 2px solid var(--hira-gold);
-        }
-        .chat-header h1 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 2px;
-            letter-spacing: 1px;
-        }
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--hira-beige);
-        }
-        .online-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background-color: #8BC34A;
-            border: 2px solid var(--hira-gold);
-        }
-        .chat-messages {
-            flex: 1;
-            padding: 18px 14px;
-            overflow-y: auto;
-            background: var(--hira-beige);
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-        .message {
-            padding: 12px 16px;
-            border-radius: var(--bubble-radius);
-            max-width: 85%;
-            word-wrap: break-word;
-            font-size: 15px;
-            position: relative;
-            box-shadow: 0 1px 4px rgba(58, 93, 35, 0.07);
-        }
-        .user-message {
-            background: var(--hira-gold);
-            color: var(--hira-brown);
-            margin-left: auto;
-            border-bottom-right-radius: 4px;
-            text-align: right;
-        }
-        .ai-message {
-            background: #fff;
-            color: var(--hira-green);
-            border: 1px solid #e9ecef;
-            margin-right: auto;
-            border-bottom-left-radius: 4px;
-            text-align: left;
-        }
-        .ai-message.rtl {
-            text-align: right;
-            direction: rtl;
-        }
-        .bot-buttons-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-        .bot-btn {
-            background: var(--hira-gold);
-            color: var(--hira-green);
-            border: none;
-            padding: 7px 20px;
-            border-radius: 18px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 1px 4px rgba(58, 93, 35, 0.07);
-            transition: background 0.2s, transform 0.1s;
-            min-height: 34px;
-        }
-        
-        .bot-btn1 {
-            background: var(--hira-gold);
-            color: var(--hira-green);
-            border: none;
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            box-shadow: 0 1px 4px rgba(58, 93, 35, 0.07);
-            transition: background 0.2s, transform 0.1s;
-            min-height: 20px;
-            margin-left: 220px;
-        }
-        .bot-btn:hover, .bot-btn:focus {
-            background: #e4c76a;
-            transform: scale(1.07);
-        }
-        .lang-switch {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-            margin-bottom: 8px;
-        }
-        .lang-btn {
-            background: transparent;
-            border: 2px solid var(--hira-gold);
-            color: var(--hira-green);
-            border-radius: 12px;
-            padding: 4px 14px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-        }
-        .lang-btn.active, .lang-btn:hover {
-            background: var(--hira-gold);
-            color: var(--hira-brown);
-        }
-        .chat-input-container {
-            padding: 14px;
-            background: #fff;
-            border-top: 2px solid var(--hira-gold);
-        }
-        .input-group {
-            display: flex;
-            gap: 8px;
-            align-items: flex-end;
-        }
-        #promptInput {
-            flex: 1;
-            padding: 12px 16px;
-            border: 1.5px solid #e9ecef;
-            border-radius: 20px;
-            font-size: 15px;
-            resize: none;
-            min-height: 40px;
-            max-height: 100px;
-            outline: none;
-            background: var(--hira-beige);
-            color: var(--hira-brown);
-            box-shadow: 0 1px 4px rgba(58, 93, 35, 0.07);
-            transition: border 0.2s, background 0.2s;
-        }
-        #promptInput::placeholder {
-            color: #999;
-            text-align: center;
-        }
-        #promptInput:focus {
-            border-color: var(--hira-gold);
-            background: #fff;
-        }
-        #sendButton {
-            background: var(--hira-green);
-            color: var(--hira-gold);
-            border: none;
-            padding: 11px 22px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 17px;
-            font-weight: 600;
-            transition: background 0.2s, color 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(58, 93, 35, 0.08);
-        }
-        #sendButton:hover:not(:disabled), #sendButton:focus:not(:disabled) {
-            background: #2e471b;
-            color: #fffbe9;
-        }
-        #sendButton:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .typing-indicator {
-            display: none;
-            padding: 10px 14px;
-            margin-bottom: 12px;
-            border-radius: var(--bubble-radius);
-            background: #fff;
-            border: 1px solid #e9ecef;
-            max-width: 80%;
-            margin-right: auto;
-        }
-        .typing-indicator.active {
-            display: block;
-        }
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-        }
-        .typing-dots span {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background-color: var(--hira-gold);
-            animation: typing 1.4s infinite ease-in-out;
-        }
-        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0; top: 0; width: 100vw; height: 100vh;
-            background: rgba(58,93,35,0.19);
-            align-items: center;
-            justify-content: center;
-        }
-        .modal.active {
-            display: flex;
-        }
-        .modal-content {
-            background: #fff;
-            border-radius: 18px;
-            padding: 28px 18px 22px 18px;
-            min-width: 320px;
-            max-width: 96vw;
-            max-height: 93vh;
-            overflow-y: auto;
-            box-shadow: 0 8px 32px rgba(58,93,35,0.19);
-            position: relative;
-            color: var(--hira-brown);
-            animation: popupIn 0.19s cubic-bezier(.4,1.6,.6,1.1);
-        }
-        @keyframes popupIn {
-            from { transform: translateY(40px) scale(0.98); opacity: 0; }
-            to { transform: none; opacity: 1; }
-        }
-        .modal-close {
-            position: absolute;
-            right: 18px;
-            top: 14px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--hira-gold);
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .modal-close:hover, .modal-close:focus {
-            color: #b28f2c;
-        }
-        .menu-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--hira-green);
-            margin-bottom: 10px;
-        }
-        .menu-items, .catering-items {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .menu-card, .catering-card {
-            background: #fffbe9;
-            border-radius: 12px;
-            box-shadow: 0 1px 6px rgba(201,161,59,0.08);
-            padding: 10px 12px 10px 12px;
-            font-size: 14px;
-        }
-        .menu-card .item-header, .catering-card .item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-        }
-        .menu-card .item-price, .catering-card .item-price {
-            color: var(--hira-gold);
-            font-weight: 700;
-            font-size: 14px;
-            min-width: 40px;
-            text-align: right;
-        }
-        .menu-card .item-desc {
-            font-size: 12px;
-            color: #888;
-            margin-top: 2px;
-        }
-        .menu-card .bot-btn, .catering-card .bot-btn {
-            margin-top: 4px;
-            font-size: 12px;
-            padding: 4px 10px;
-        }
-        .cart-section {
-            margin-top: 10px;
-        }
-        .cart-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--hira-green);
-            margin-bottom: 4px;
-        }
-        .cart-items {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 4px;
-        }
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f5f5f5;
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-size: 13px;
-        }
-        .cart-item .cart-qty {
-            margin: 0 6px;
-            font-weight: 600;
-        }
-        .cart-total {
-            font-weight: 700;
-            color: var(--hira-gold);
-            margin-bottom: 4px;
-        }
-        .cart-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-        .cart-btn {
-            background: var(--hira-green);
-            color: var(--hira-beige);
-            border: none;
-            border-radius: 12px;
-            padding: 5px 13px;
-            font-size: 12px;
-            cursor: pointer;
-            margin-left: 4px;
-        }
-        .cart-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .checkout-form label {
-            display: block;
-            margin-bottom: 1px;
-            font-size: 13px;
-        }
-        .checkout-form input {
-            width: 95%;
-            padding: 5px 8px;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-            margin-bottom: 7px;
-            font-size: 13px;
-        }
-        .checkout-form button {
-            background: var(--hira-gold);
-            color: var(--hira-green);
-            border: none;
-            border-radius: 12px;
-            padding: 7px 15px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .checkout-form button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        ul.catering-list {
-            margin: 7px 0 0 12px;
-            padding-left: 14px;
-            color: #666;
-            font-size: 12px;
-        }
-        @media (max-width: 600px) {
-            .chat-container { height: 100vh; border-radius: 0; max-width: 100%; }
-            .message { max-width: 94%; }
-            .modal-content { min-width: 96vw; }
-        }
-        .modal-content {
-    background: #fff;
-    border-radius: 18px;
-    padding: 28px 18px 22px 18px;
-    max-width: 350px !important;
-    width: 100vw !important;
-    max-height: 93vh;
-    overflow-y: auto;
-    box-shadow: 0 8px 32px rgba(58,93,35,0.19);
-    position: relative;
-    color: var(--hira-brown);
-    animation: popupIn 0.19s cubic-bezier(.4,1.6,.6,1.1);
-}
-
-    </style>
-</head>
-<body>
-<div class="chat-container">
-    <div class="chat-header">
-        <h1>Hira Foods AI Assistant</h1>
-        <div class="status-indicator">
-            <div class="online-dot"></div>
-            <span>Online</span>
-        </div>
-    </div>
-    <div class="chat-messages" id="chatMessages">
-        <div class="lang-switch">
-            <button class="lang-btn active" id="langEnBtn">English</button>
-            <button class="lang-btn" id="langNoBtn">Norsk</button>
-        </div>
-        <div class="ai-message message" id="welcomeMsg"></div>
-    </div>
-    <div class="typing-indicator" id="typingIndicator">
-        <div class="typing-dots">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-    <div class="chat-input-container">
-        <div class="input-group">
-            <textarea 
-                id="promptInput" 
-                rows="1"
-                placeholder="Type your message in English or Norwegian..."
-            ></textarea>
-            <button id="sendButton" aria-label="Send">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-</div>
-<!-- Modal -->
-<!-- <div class="modal" id="mainModal" tabindex="-1" aria-modal="true" role="dialog">
-    <div class="modal-content" id="modalContent">
-        <!-- Dynamic content -->
-<!--     </div>
-</div>
-<script>
-const translations = {
-    en: {
-        welcome: "Welcome to Hira Foods!<br>How can I help you today?<br><span style='font-size:12px;color:#C9A13B;'>(You may ask in English or Norwegian)</span>",
-        orderMenu: "Order from Menu",
-        catering: "Explore Catering Packages",
-        add: "Add to Cart",
-        added: "Added!",
-        checkout: "Checkout",
-        clearCart: "Clear Cart",
-        cart: "Your Cart",
-        emptyCart: "Cart is empty.",
-        total: "Total",
-        name: "Name",
-        address: "Address",
-        phone: "Phone Number",
-        placeOrder: "Place Order",
-        allergens: "Allergens & other notes: 1 Gluten, 2 Shellfish, 3 Eggs, 4 Fish, 5 Peanuts, 6 Soybean, 7 Milk, 8 Nuts, 9 Celery, 10 Mustard, 11 Sesame seeds, 12 Sulfur dioxide and sulfites, 13 Lupine, 14 Mollusks"
-    },
-    no: {
-        welcome: "Velkommen til Hira Foods!<br>Hvordan kan jeg hjelpe deg i dag?<br><span style='font-size:12px;color:#C9A13B;'>(Du kan spørre på engelsk eller norsk)</span>",
-        orderMenu: "Bestill fra menyen",
-        catering: "Utforsk cateringpakker",
-        add: "Legg til i handlekurv",
-        added: "Lagt til!",
-        checkout: "Fullfør bestilling",
-        clearCart: "Tøm handlekurv",
-        cart: "Handlekurv",
-        emptyCart: "Handlekurven er tom.",
-        total: "Totalt",
-        name: "Navn",
-        address: "Adresse",
-        phone: "Telefonnummer",
-        placeOrder: "Send bestilling",
-        allergens: "Allergener og andre notater: 1 Gluten, 2 Skalldyr, 3 Egg, 4 Fisk, 5 Peanøtter, 6 Soyabønner, 7 Melk, 8 Nøtter, 9 Selleri, 10 Sennep, 11 Sesamfrø, 12 Svoveldioksid og sulfitter, 13 Lupin, 14 Bløtdyr"
-    }
-};
-
-const menuData = {
-    en: {
-        nashta: [
-            { name: "Tasting menu for 2 people", desc: "Halwa puri, nihari, haleem, 2 naan, 2 puris", price: 490 },
-            { name: "Halwa puri", desc: "Potato stew, chana, sweet semolina, 1 puri", price: 159 },
-            { name: "Paye", desc: "Lamb/cow hoof stew, naan", price: 189 },
-            { name: "Nihari", desc: "Beef stew, naan", price: 169 },
-            { name: "Haleem", desc: "Lamb & lentil stew, naan", price: 169 },
-            { name: "Andha Paratha", desc: "Omelette with spices, paratha", price: 109 },
-            { name: "Aloo Paratha", desc: "Potato paratha, mint sauce", price: 109 },
-            { name: "Saag Paratha", desc: "Greens stew, paratha", price: 149 },
-            { name: "Kheer", desc: "Rice pudding", price: 79 },
-            { name: "Desi Chai", desc: "Spiced tea", price: 49 },
-            { name: "Lassi", desc: "Sweet, salty, or mango", price: 59 }
-        ],
-        catering: [
-            {
-                name: "CATERING PACKAGE 1",
-                price: 199,
-                details: [
-                    "A curry/salad: Morg Korma (chicken), Ghost Korma (mutton), Cabbage Meat",
-                    "One vegetarian dish: Chane (chickpeas), Palak Paneer (spinach & feta)",
-                    "One rice dish: Sabzi Palao (vegetable), Zera Palao (spiced)",
-                    "With the food: Alo Bahara Chatni (plum), Podina Chatni (mint), Naan, Salad",
-                    "One dessert: Kheer (rice pudding), Matanjan (sweet rice with nuts)"
-                ]
-            },
-            {
-                name: "CATERING PACKAGE 2",
-                price: 259,
-                details: [
-                    "Two curries: Morg Korma, Ghost Korma, Cabbage Meat, Jalfarezi (chicken & veg), Deghi Kebab (veg kebab)",
-                    "One vegetarian dish: Chane, Palak Paneer",
-                    "One rice dish: Sabzi Palao, Zera Palao",
-                    "With the food: Alo Bahara Chatni, Podina Chatni, Naan, Salad",
-                    "One dessert: Kheer, Matanjan, Gajar Ka Halwa (carrot pudding)"
-                ]
-            },
-            {
-                name: "CATERING PACKAGE 3",
-                price: 309,
-                details: [
-                    "A grilled dish: Morg Rost (lemon chicken), Tali Hoi Machli (fried cod), Seekh Kebab (minced lamb/chicken)",
-                    "Two curries: Morg Korma, Ghost Korma, Cabbage Meat, Deghi Kebab, Jalfarezi",
-                    "One vegetarian dish: Chane, Palak Paneer",
-                    "One rice dish: Sabzi Palao, Zera Palao",
-                    "With the food: Alo Bakhara Chatni, Podina Chatni, Naan, Salad",
-                    "One dessert: Kheer, Matanjan, Gajar Ka Halwa, Gulab Jaman (milk buns in syrup)"
-                ]
-            },
-            {
-                name: "CATERING PACKAGE 4",
-                price: 449,
-                details: [
-                    "Three grilled dishes: Lamb roast, Tali Hoi Machli, Morg Tikka (chicken skewers)",
-                    "Three curries: Ghost Korma, Cabbage Meat, Jalfarezi, Deghi Kebab",
-                    "One vegetarian dish: Chane, Palak Paneer",
-                    "One rice dish: Sabzi Palao, Zera Palao",
-                    "With the food: Alo Bahara Chatni, Podina Chatni, Naan, Salad",
-                    "Two desserts: Kheer, Matanjan, Gajar Ka Halwa, Gulab Jaman"
-                ]
-            }
-        ]
-    },
-    no: {
-        nashta: [
-            { name: "Smaksmeny for 2 personer", desc: "Halwa puri, nihari, haleem, 2 naan, 2 puris", price: 490 },
-            { name: "Halwa puri", desc: "Potetgryte, kikerter, søt semulegryn, 1 puri", price: 159 },
-            { name: "Paye", desc: "Lam/okse-fotgryte, naan", price: 189 },
-            { name: "Nihari", desc: "Oksegryte, naan", price: 169 },
-            { name: "Haleem", desc: "Lam- og linsegryte, naan", price: 169 },
-            { name: "Andha Paratha", desc: "Omelett med krydder, paratha", price: 109 },
-            { name: "Aloo Paratha", desc: "Potet-paratha, myntesaus", price: 109 },
-            { name: "Saag Paratha", desc: "Grønn grønnsaksgryte, paratha", price: 149 },
-            { name: "Kheer", desc: "Rispudding", price: 79 },
-            { name: "Desi Chai", desc: "Krydret te", price: 49 },
-            { name: "Lassi", desc: "Søt, salt eller mango", price: 59 }
-        ],
-        catering: [
-            {
-                name: "CATERINGPAKKE 1",
-                price: 199,
-                details: [
-                    "En curry/salat: Morg Korma (kylling), Ghost Korma (lam), Kål og kjøtt",
-                    "En vegetarrett: Chane (kikerter), Palak Paneer (spinat & feta)",
-                    "En risrett: Sabzi Palao (grønnsaker), Zera Palao (krydret)",
-                    "Til maten: Alo Bahara Chatni (plomme), Podina Chatni (mynte), Naan, Salat",
-                    "En dessert: Kheer (rispudding), Matanjan (søt ris med nøtter)"
-                ]
-            },
-            {
-                name: "CATERINGPAKKE 2",
-                price: 259,
-                details: [
-                    "To curryretter: Morg Korma, Ghost Korma, Kål og kjøtt, Jalfarezi (kylling & grønnsaker), Deghi Kebab (vegetarkebab)",
-                    "En vegetarrett: Chane, Palak Paneer",
-                    "En risrett: Sabzi Palao, Zera Palao",
-                    "Til maten: Alo Bahara Chatni, Podina Chatni, Naan, Salat",
-                    "En dessert: Kheer, Matanjan, Gajar Ka Halwa (gulrotpudding)"
-                ]
-            },
-            {
-                name: "CATERINGPAKKE 3",
-                price: 309,
-                details: [
-                    "En grillrett: Morg Rost (sitronkylling), Tali Hoi Machli (stekt torsk), Seekh Kebab (kvernet lam/kylling)",
-                    "To curryretter: Morg Korma, Ghost Korma, Kål og kjøtt, Deghi Kebab, Jalfarezi",
-                    "En vegetarrett: Chane, Palak Paneer",
-                    "En risrett: Sabzi Palao, Zera Palao",
-                    "Til maten: Alo Bakhara Chatni, Podina Chatni, Naan, Salat",
-                    "En dessert: Kheer, Matanjan, Gajar Ka Halwa, Gulab Jaman (melboller i sirup)"
-                ]
-            },
-            {
-                name: "CATERINGPAKKE 4",
-                price: 449,
-                details: [
-                    "Tre grillretter: Lammefilet, Tali Hoi Machli, Morg Tikka (kyllingspyd)",
-                    "Tre curryretter: Ghost Korma, Kål og kjøtt, Jalfarezi, Deghi Kebab",
-                    "En vegetarrett: Chane, Palak Paneer",
-                    "En risrett: Sabzi Palao, Zera Palao",
-                    "Til maten: Alo Bahara Chatni, Podina Chatni, Naan, Salat",
-                    "To desserter: Kheer, Matanjan, Gajar Ka Halwa, Gulab Jaman"
-                ]
-            }
-        ]
-    }
-};
-
-let botLang = 'en';
-let cart = [];
-let modalType = null; // "menu" or "catering"
-
-document.getElementById('langEnBtn').onclick = () => { setLanguage('en'); };
-document.getElementById('langNoBtn').onclick = () => { setLanguage('no'); };
-
-function setLanguage(lang) {
-    botLang = lang;
-    document.getElementById('langEnBtn').classList.toggle('active', botLang === 'en');
-    document.getElementById('langNoBtn').classList.toggle('active', botLang === 'no');
-    renderWelcome();
-    if (document.getElementById('mainModal').classList.contains('active')) {
-        if (modalType === "menu") openMenuModal();
-        else if (modalType === "catering") openCateringModal();
-    }
-}
-
-function renderWelcome() {
-    document.getElementById('welcomeMsg').innerHTML = `
-        <b>${translations[botLang].welcome}</b>
-        <div class="bot-buttons-row">
-            <button class="bot-btn" onclick="openMenuModal()">${translations[botLang].orderMenu}</button>
-            <button class="bot-btn" onclick="openCateringModal()">${translations[botLang].catering}</button>
-        </div>
-    `;
-}
-
-// Modal logic
-function openMenuModal() {
-    modalType = "menu";
-    cart = cart || [];
-    renderMenuModal();
-    openModal();
-}
-function openCateringModal() {
-    modalType = "catering";
-    renderCateringModal();
-    openModal();
-}
-function openModal() {
-    document.getElementById('mainModal').classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-function closeModal() {
-    document.getElementById('mainModal').classList.remove('active');
-    document.body.style.overflow = '';
-}
-document.getElementById('mainModal').onclick = function(e) {
-    if (e.target === this) closeModal();
-};
-document.addEventListener('keydown', function(e) {
-    if (e.key === "Escape") closeModal();
-});
-
-function renderMenuModal() {
-    const t = translations[botLang];
-    let html = `
-        <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
-        <div class="menu-title">${t.orderMenu}</div>
-        <div class="menu-items">
-            ${menuData[botLang].nashta.map(item => `
-                <div class="menu-card">
-                    <div class="item-header">
-                        <span>${item.name}</span>
-                        <span class="item-price">${item.price} kr</span>
-                    </div>
-                    <div class="item-desc">${item.desc}</div>
-                    <button class="bot-btn1" onclick="addToCart('${item.name.replace(/'/g,"\\'")}',${item.price})">${t.add}</button>
-                </div>
-            `).join('')}
-        </div>
-        <div style="font-size:11px;color:#b28f2c;margin-top:8px;">${t.allergens}</div>
-        <div id="cartSection"></div>
-    `;
-    document.getElementById('modalContent').innerHTML = html;
-    renderCart();
-}
-function renderCateringModal() {
-    const t = translations[botLang];
-    let html = `
-        <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
-        <div class="menu-title">${t.catering}</div>
-        <div class="catering-items">
-            ${menuData[botLang].catering.map(pkg => `
-                <div class="catering-card">
-                    <div class="item-header">
-                        <span>${pkg.name}</span>
-                        <span class="item-price">${pkg.price} kr</span>
-                    </div>
-                    <ul class="catering-list">
-                        ${pkg.details.map(line => `<li>${line}</li>`).join('')}
-                    </ul>
-                </div>
-            `).join('')}
-        </div>
-        <div style="font-size:11px;color:#b28f2c;margin-top:8px;">${t.allergens}</div>
-    `;
-    document.getElementById('modalContent').innerHTML = html;
-}
-
-// Menu cart logic
-function addToCart(name, price) {
-    let found = cart.find(item => item.name === name);
-    if (found) found.qty++;
-    else cart.push({ name, price, qty: 1 });
-    renderCart();
-}
-function removeFromCart(name) {
-    cart = cart.filter(item => item.name !== name);
-    renderCart();
-}
-function changeQty(name, delta) {
-    let item = cart.find(i => i.name === name);
-    if (item) {
-        item.qty += delta;
-        if (item.qty < 1) item.qty = 1;
-        renderCart();
-    }
-}
-function resetCart() {
-    cart = [];
-    renderCart();
-}
-function renderCart() {
-    if (modalType !== "menu") return;
-    const t = translations[botLang];
-    const cartSection = document.getElementById('cartSection');
-    if (!cartSection) return;
-    let html = `<div class="cart-section">
-        <div class="cart-title">${t.cart}</div>
-        <div class="cart-items">`;
-    if (cart.length === 0) {
-        html += `<span style="color:#888;">${t.emptyCart}</span>`;
-    } else {
-        cart.forEach(item => {
-            html += `
-            <div class="cart-item">
-                <span>${item.name}</span>
-                <span>
-                    <button class="cart-btn" style="padding:2px 8px;" onclick="changeQty('${item.name.replace(/'/g,"\\'")}',-1)">-</button>
-                    <span class="cart-qty">${item.qty}</span>
-                    <button class="cart-btn" style="padding:2px 8px;" onclick="changeQty('${item.name.replace(/'/g,"\\'")}',1)">+</button>
-                    <span style="margin-left:8px;">${item.price * item.qty} kr</span>
-                    <button class="cart-btn" style="padding:2px 8px;background:#b23c3c;color:#fff;margin-left:8px;" onclick="removeFromCart('${item.name.replace(/'/g,"\\'")}')">&times;</button>
-                </span>
-            </div>`;
-        });
-    }
-    html += `</div>
-        <div class="cart-total">${t.total}: ${cart.reduce((sum, item) => sum + item.price * item.qty, 0)} kr</div>
-        <div class="cart-actions">
-            <button class="cart-btn" id="checkoutBtn" onclick="showCheckoutForm()" ${cart.length === 0 ? 'disabled' : ''}>${t.checkout}</button>
-            <button class="cart-btn" onclick="resetCart()">${t.clearCart}</button>
-        </div>
-        <div id="checkoutFormContainer"></div>
-    </div>`;
-    cartSection.innerHTML = html;
-}
-function showCheckoutForm() {
-    const t = translations[botLang];
-    let html = `
-        <form class="checkout-form" onsubmit="submitOrder(event)">
-            <label>${t.name}</label>
-            <input type="text" id="orderName" required>
-            <label>${t.address}</label>
-            <input type="text" id="orderAddress" required>
-            <label>${t.phone}</label>
-            <input type="tel" id="orderPhone" required>
-            <button type="submit">${t.placeOrder}</button>
-        </form>
-    `;
-    let checkoutFormContainer = document.getElementById('checkoutFormContainer');
-    if (checkoutFormContainer) checkoutFormContainer.innerHTML = html;
-}
-function submitOrder(e) {
+promptInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
-    alert(botLang==='en'?'Order placed! (Demo only)':'Bestilling sendt! (Demo)');
-    cart = [];
-    renderCart();
-    closeModal();
-}
-
-// --- Existing chat functionality ---
-const API_URL = 'https://hinabackend-production.up.railway.app/chat';
-const chatMessages = document.getElementById('chatMessages');
-const promptInput = document.getElementById('promptInput');
-const sendButton = document.getElementById('sendButton');
-const typingIndicator = document.getElementById('typingIndicator');
-const messagesEndRef = document.createElement('div');
-
-promptInput.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    sendMessage();
+  }
 });
 
-promptInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleSubmit();
-    }
+sendButton.addEventListener('click', sendMessage);
+
+resetButton.addEventListener('click', () => {
+  // Clear UI chat, clear storage, reload page for fresh start
+  sessionStorage.removeItem('chatMessages');
+  window.location.reload();
 });
 
-sendButton.addEventListener('click', handleSubmit);
+function disableInput() {
+  promptInput.disabled = true;
+  sendButton.disabled = true;
+}
 
-function createMessage(content, isUser = false) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+function enableInput() {
+  promptInput.disabled = false;
+  toggleSendButton();
+  promptInput.focus();
+}
 
-    // Detect real RTL languages only (Arabic, Urdu, Hebrew etc.)
-    const isRTL = /[\u0600-\u06FF\u0750-\u077F\u0590-\u05FF]/.test(content);
-    if (!isUser && isRTL) {
-        messageDiv.style.direction = "rtl";
-        messageDiv.style.textAlign = "right";
-    } else {
-        messageDiv.style.direction = "ltr";
-        messageDiv.style.textAlign = "left";
+// Send user message and fetch bot response
+async function sendMessage() {
+  const prompt = promptInput.value.trim();
+  if (!prompt) return;
+
+  // Display user message immediately
+  createMessage(prompt, true);
+  sessionMessages.push({ content: prompt, isUser: true });
+  saveMessagesToStorage();
+
+  // Clear input and disable while waiting
+  promptInput.value = '';
+  promptInput.style.height = 'auto';
+  disableInput();
+  showTyping();
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', // to maintain cookies/session with backend
+      body: JSON.stringify({ message: prompt })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.statusText}`);
     }
 
-    messageDiv.innerHTML = content.replace(/\n/g, '<br>');
-    chatMessages.appendChild(messageDiv);
-    chatMessages.appendChild(messagesEndRef);
-    messagesEndRef.scrollIntoView({ behavior: 'smooth' });
-    return messageDiv;
-}
+    const data = await response.json();
 
-
-function showTyping() {
-    typingIndicator.classList.add('active');
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function hideTyping() {
-    typingIndicator.classList.remove('active');
-}
-
-async function handleSubmit() {
-    const prompt = promptInput.value.trim();
-    if (!prompt) return;
-
-    createMessage(prompt, true);
-    promptInput.value = '';
-    promptInput.style.height = 'auto';
-    sendButton.disabled = true;
-    sendButton.innerHTML = `<span style="font-size:18px;">...</span>`;
-    showTyping();
-
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: prompt }) // 👈 match Flask 'message' key
-        });
-
-        const data = await response.json();
-        createMessage(data.response, false); // 👈 use 'data.response' from Flask
-
-    } catch (error) {
-        createMessage('Sorry, there was an error connecting to the server.');
-    } finally {
-        sendButton.disabled = false;
-        sendButton.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>`;
-        hideTyping();
-        promptInput.focus();
+    // Display bot message
+    if (data.response) {
+      createMessage(data.response, false);
+      sessionMessages.push({ content: data.response, isUser: false });
+      saveMessagesToStorage();
+    } else if (data.error) {
+      createMessage(`Error: ${data.error}`, false);
+      sessionMessages.push({ content: `Error: ${data.error}`, isUser: false });
+      saveMessagesToStorage();
     }
+
+  } catch (err) {
+    createMessage('Sorry, there was an error connecting to the server.', false);
+    sessionMessages.push({ content: 'Sorry, there was an error connecting to the server.', isUser: false });
+    saveMessagesToStorage();
+  } finally {
+    hideTyping();
+    enableInput();
+  }
 }
 
+// Initialize chat on page load
+window.addEventListener('DOMContentLoaded', () => {
+  // Optionally add a date/time separator on top if none exist
+  if (!sessionStorage.getItem('chatMessages')) {
+    const dateRow = document.createElement('div');
+    dateRow.style.textAlign = "center";
+    dateRow.style.margin = "10px 0 15px 0";
+    dateRow.style.color = "#bbb";
+    dateRow.style.fontSize = "13px";
+    dateRow.innerText = new Date().toLocaleDateString(undefined, {
+      weekday: 'long',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+    chatMessages.appendChild(dateRow);
+  }
 
-window.addToCart = addToCart;
-window.removeFromCart = removeFromCart;
-window.changeQty = changeQty;
-window.resetCart = resetCart;
-window.showCheckoutForm = showCheckoutForm;
-window.submitOrder = submitOrder;
-window.renderWelcome = renderWelcome;
-window.openMenuModal = openMenuModal;
-window.openCateringModal = openCateringModal;
-
-window.addEventListener('load', () => { promptInput.focus(); renderWelcome(); });
+  loadMessagesFromStorage();
+  toggleSendButton();
+  promptInput.focus();
+});
 </script>
 </body>
 </html>
- -->

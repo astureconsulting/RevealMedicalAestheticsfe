@@ -1,347 +1,413 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>HUM2N Asthetics AI Assistant</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <style>
 :root {
---webring-yellow: #727B97;
---webring-black: #222;
---webring-bg: #F4F4F4;
---webring-gray: #555;
---user-bubble-bg: #FFF9C4;
---bot-bubble-bg: #222;
---bot-bubble-color: #fff;
---border-radius: 18px;
+  --webring-yellow: #727B97;
+  --webring-black: #222;
+  --webring-bg: #F4F4F4;
+  --webring-gray: #555;
+  --user-bubble-bg: #FFF9C4;
+  --bot-bubble-bg: #222;
+  --bot-bubble-color: #fff;
+  --border-radius: 18px;
 }
-html, body {height: 100%; }
+html, body { height: 100%; margin: 0; }
 body {
-min-height: 100vh;
-background: var(--webring-bg);
-font-family: 'Segoe UI', 'Tahoma', Geneva, Verdana, sans-serif;
-color: var(--webring-black);
-display: flex;
-align-items: center;
-justify-content: center;
+  min-height: 100vh;
+  background: var(--webring-bg);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--webring-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .chat-container {
-background: #fff;
-box-shadow: 0 6px 24px rgba(58,93,35,0.09);
-width: 100%;
-max-width: 410px;
-height: 600px;
-display: flex;
-flex-direction: column;
-/* border: 1.5px solid  var(--bot-bubble-bg); */
-overflow: hidden;
+  background: #fff;
+  box-shadow: 0 6px 24px rgba(58,93,35,0.09);
+  width: 100%;
+  max-width: 410px;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .chat-header {
-background: var(--webring-yellow);
-color: var(--webring-black);
-padding: 14px 0 10px 0;
-text-align: left;
-border-bottom: 1.5px solid #fffbe5;
-font-weight: 700;
-letter-spacing: 0.5px;
-display: flex;
-align-items: center;
-position: relative;
+  background: var(--webring-yellow);
+  color: var(--webring-black);
+  padding: 14px 0 10px 0;
+  text-align: left;
+  border-bottom: 1.5px solid #fffbe5;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 .chat-header h1 {
-font-size: 20px;
-font-weight: 700;
-padding-left: 22px;
-margin: 0;
-flex: 1;
-user-select: none;
-color: white; 
+  font-size: 20px;
+  font-weight: 700;
+  padding-left: 22px;
+  margin: 0;
+  flex: 1;
+  user-select: none;
+  color: white;
 }
 .chat-header .close {
-position: absolute;
-right: 13px; top: 13px;
-font-size: 23px;
-color: #666;
-background: none;
-border: none;
-cursor: pointer;
+  position: absolute;
+  right: 13px; top: 13px;
+  font-size: 23px;
+  color: #666;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 .chat-messages {
-flex: 1;
-padding: 20px 14px;
-overflow-y: auto;
-background: #fff;
-display: flex;
-flex-direction: column;
+  flex: 1;
+  padding: 20px 14px;
+  overflow-y: auto;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
 }
 .message-row {
-display: flex;
-align-items: flex-end;
-margin-bottom: 8px;
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 8px;
 }
 .avatar {
-width: 36px; height: 36px;
-border-radius: 50%;
-background: #ddd;
-margin-right: 7px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #ddd;
+  margin-right: 7px;
 }
 .avatar.user {
-margin-left: 7px; margin-right: 0;
+  margin-left: 7px;
+  margin-right: 0;
 }
 .message {
-padding: 13px 18px;
-border-radius: var(--border-radius);
-max-width: 77%;
-font-size: 15px;
-word-break: break-word;
-box-shadow: 0 1px 4px rgba(34,34,34,0.06);
-line-height: 1.55;
+  padding: 13px 18px;
+  border-radius: var(--border-radius);
+  max-width: 77%;
+  font-size: 15px;
+  word-break: break-word;
+  box-shadow: 0 1px 4px rgba(34,34,34,0.06);
+  line-height: 1.55;
 }
 .message.bot {
-background: var(--bot-bubble-bg);
-color: var(--bot-bubble-color);
-margin-right: auto;
-border-bottom-left-radius: 6px;
+  background: var(--bot-bubble-bg);
+  color: var(--bot-bubble-color);
+  margin-right: auto;
+  border-bottom-left-radius: 6px;
 }
 .message.user {
-background: var(--user-bubble-bg);
-color: var(--webring-black);
-margin-left: auto;
-border-bottom-right-radius: 6px;
-text-align: right;
+  background: var(--user-bubble-bg);
+  color: var(--webring-black);
+  margin-left: auto;
+  border-bottom-right-radius: 6px;
+  text-align: right;
 }
 .message-meta {
-font-size: 12px; color: #999;
-margin-top: 3px;
-margin-bottom: 0;
-padding: 0 4px;
+  font-size: 12px;
+  color: #999;
+  margin-top: 3px;
+  margin-bottom: 0;
+  padding: 0 4px;
 }
 .typing-indicator {
-display: none;
-padding: 9px 14px;
-margin-bottom: 10px;
-border-radius: var(--border-radius);
-background: #f8f8f8;
-border: 1px solid #eee;
-color: #888;
-margin-right: auto;
-margin-left: 0;
-font-size: 14px;
+  display: none;
+  padding: 9px 14px;
+  margin-bottom: 10px;
+  border-radius: var(--border-radius);
+  background: #f8f8f8;
+  border: 1px solid #eee;
+  color: #888;
+  margin-right: auto;
+  margin-left: 0;
+  font-size: 14px;
 }
 .typing-indicator.active {
-display: inline-block;
+  display: inline-block;
 }
 .chat-input-container {
-padding: 10px 12px;
-background: #fff;
-border-top: 1.5px solid var(--webring-yellow);
-background: var(--bot-bubble-bg);
+  padding: 10px 12px;
+  border-top: 1.5px solid var(--webring-yellow);
+  background: var(--bot-bubble-bg);
 }
 .input-group {
-display: flex;
-gap: 8px;
-align-items: flex-end;
-background: var(--bot-bubble-bg);
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  background: var(--bot-bubble-bg);
 }
 #promptInput {
-flex: 1;
-padding: 12px 16px;
-border: 1.5px solid #ececec;
-border-radius: 20px;
-font-size: 15px;
-min-height: 20px;
-max-height: 20px;
-outline: none;
-background: #f8f8f8;
-color: var(--webring-black);
-resize: none;
-transition: border 0.18s, background 0.15s;
+  flex: 1;
+  padding: 12px 16px;
+  border: 1.5px solid #ececec;
+  border-radius: 20px;
+  font-size: 15px;
+  min-height: 20px;
+  max-height: 80px;
+  outline: none;
+  background: #f8f8f8;
+  color: var(--webring-black);
+  resize: none;
+  transition: border 0.18s, background 0.15s;
 }
 #promptInput::placeholder {
-color: #979797;
+  color: #979797;
 }
 #promptInput:focus {
-border-color: var(--webring-yellow);
-background: #fffbe5;
+  border-color: var(--webring-yellow);
+  background: #fffbe5;
 }
 #sendButton {
-background: var(--webring-yellow);
-color: var(--webring-black);
-border: none;
-padding: 12px 19px;
-border-radius: 20px;
-cursor: pointer;
-font-size: 17px;
-font-weight: 600;
-transition: background 0.18s, color 0.18s;
-display: flex;
-align-items: center;
-box-shadow: 0 2px 8px rgba(58,93,35,0.06);
+  background: var(--webring-yellow);
+  color: var(--webring-black);
+  border: none;
+  padding: 12px 19px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(58,93,35,0.06);
 }
 #sendButton:disabled {
-opacity: 0.5;
-cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 #sendButton:hover:not(:disabled),
 #sendButton:focus:not(:disabled) {
-background: #ffec80;
-color: #111;
+  background: #ffec80;
+  color: #111;
 }
 @media (max-width: 650px) {
-.chat-container { height: 100vh; border-radius: 0; max-width: 100%; }
-.message { max-width: 90vw; }
+  .chat-container { height: 100vh; border-radius: 0; max-width: 100%; }
+  .message { max-width: 90vw; }
 }
 </style>
 </head>
 <body>
+
 <div class="chat-container">
-<div class="chat-header">
-<h1>HUM2N Asthetics AI Assistant</h1>
-<button class="close" title="Close" onclick="window.location.reload()">&times;</button>
+  <div class="chat-header">
+    <h1>HUM2N Asthetics AI Assistant</h1>
+    <button class="close" title="Close">&times;</button>
+  </div>
+
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="typing-indicator" id="typingIndicator">
+    HUM2N Asthetics Bot is typing...
+  </div>
+  <div class="chat-input-container">
+    <div class="input-group">
+      <textarea
+        id="promptInput"
+        rows="1"
+        placeholder="Type your message here..."
+        autocomplete="off"
+      ></textarea>
+      <button id="sendButton" aria-label="Send">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
 </div>
 
-<div class="chat-messages" id="chatMessages"></div>
-<div class="typing-indicator" id="typingIndicator">
-HUM2N Asthetics Bot is typing...
-</div>
-<div class="chat-input-container">
-<div class="input-group">
-<textarea
-id="promptInput"
-rows="1"
-placeholder="Type your message here..."
-autocomplete="off"
-></textarea>
-<button id="sendButton" aria-label="Send">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-<path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-<path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</button>
-</div>
-</div>
-</div>
 <script>
-const API_URL = 'https://web-production-ad5c.up.railway.app/chat'; // Set to your Flask backend endpoint
+const API_URL = 'https://web-production-ad5c.up.railway.app/chat'; // Your backend chat API endpoint
+const RESET_URL = 'https://web-production-ad5c.up.railway.app/reset'; // Your backend reset API endpoint
+
 const BOT_AVATAR = "https://img.icons8.com/color/96/robot.png";
 const USER_AVATAR = "https://img.icons8.com/ios-glyphs/60/000000/user--v1.png";
-// Example: General user icon from Icons8
-
 
 const chatMessages = document.getElementById('chatMessages');
 const promptInput = document.getElementById('promptInput');
 const sendButton = document.getElementById('sendButton');
 const typingIndicator = document.getElementById('typingIndicator');
+const closeBtn = document.querySelector('.close');
 const messagesEndRef = document.createElement('div'); // for auto-scroll
 
-let isFirstMessage = true;
-
 function createMessage(content, isUser = false, metaText = "") {
-const msgRow = document.createElement('div');
-msgRow.className = 'message-row';
-// Avatar
-const avatar = document.createElement('img');
-avatar.className = 'avatar' + (isUser ? ' user' : '');
-avatar.src = isUser ? USER_AVATAR : BOT_AVATAR;
-avatar.alt = isUser ? "You" : "Bot";
-avatar.loading = "lazy";
-avatar.width = 36; avatar.height = 36;
+  const msgRow = document.createElement('div');
+  msgRow.className = 'message-row';
 
-// Message bubble
-const msgDiv = document.createElement('div');
-msgDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-msgDiv.innerHTML = content.replace(/\n/g, "<br>");
+  // Avatar
+  const avatar = document.createElement('img');
+  avatar.className = 'avatar' + (isUser ? ' user' : '');
+  avatar.src = isUser ? USER_AVATAR : BOT_AVATAR;
+  avatar.alt = isUser ? "You" : "Bot";
+  avatar.loading = "lazy";
+  avatar.width = 36; avatar.height = 36;
 
-if (isUser) {
-msgRow.appendChild(msgDiv);
-msgRow.appendChild(avatar);
-} else {
-msgRow.appendChild(avatar);
-msgRow.appendChild(msgDiv);
-}
+  // Message bubble
+  const msgDiv = document.createElement('div');
+  msgDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+  msgDiv.innerHTML = content.replace(/\n/g, "<br>");
 
-chatMessages.appendChild(msgRow);
+  if (isUser) {
+    msgRow.appendChild(msgDiv);
+    msgRow.appendChild(avatar);
+  } else {
+    msgRow.appendChild(avatar);
+    msgRow.appendChild(msgDiv);
+  }
 
-// Meta (timestamp)
-if (metaText) {
-const meta = document.createElement('div');
-meta.className = 'message-meta';
-meta.innerText = metaText;
-msgRow.appendChild(meta);
-}
+  chatMessages.appendChild(msgRow);
 
-chatMessages.appendChild(messagesEndRef);
-messagesEndRef.scrollIntoView({ behavior: 'smooth' });
-return msgRow;
+  // Meta (optional timestamp or info)
+  if (metaText) {
+    const meta = document.createElement('div');
+    meta.className = 'message-meta';
+    meta.innerText = metaText;
+    msgRow.appendChild(meta);
+  }
+
+  chatMessages.appendChild(messagesEndRef);
+  messagesEndRef.scrollIntoView({ behavior: 'smooth' });
+  return msgRow;
 }
 
 function showTyping() {
-typingIndicator.style.display = 'block';
-chatMessages.scrollTop = chatMessages.scrollHeight;
+  typingIndicator.style.display = 'block';
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 function hideTyping() {
-typingIndicator.style.display = 'none';
+  typingIndicator.style.display = 'none';
 }
 
 function getCurrentDate() {
-const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
-return new Date().toLocaleDateString(undefined, options);
+  const options = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
+  return new Date().toLocaleDateString(undefined, options);
 }
 
-// Initial welcome message
-window.addEventListener('DOMContentLoaded', () => {
-// Show date line
-const dateRow = document.createElement('div');
-dateRow.style.textAlign = "center";
-dateRow.style.margin = "10px 0 15px 0";
-dateRow.style.color = "#bbb";
-dateRow.style.fontSize = "13px";
-dateRow.innerText = getCurrentDate();
-chatMessages.appendChild(dateRow);
+async function loadChatHistory() {
+  try {
+    // Request to backend to get raw chat session history
+    // Since you have no specific endpoint yet, we'll simulate by sending empty user message
+    // Assuming backend sends you entire chat history on successful empty or special request
+    // If your backend does not support this, you would need to add such API.
+    
+    // Here we do a special fetch with a reserved param message '__load_history__' to get saved history back
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ message: "__load_history__" })
+    });
+    const data = await response.json();
 
-});
+    // If your backend is not supporting this, remove above and skip loading history
 
-promptInput.addEventListener('input', function() {
-this.style.height = 'auto';
-this.style.height = Math.min(this.scrollHeight, 80) + 'px';
-});
+    if(data.history && Array.isArray(data.history)) {
+      chatMessages.innerHTML = ""; // clear current messages
+      // Show date line
+      const dateRow = document.createElement('div');
+      dateRow.style.textAlign = "center";
+      dateRow.style.margin = "10px 0 15px 0";
+      dateRow.style.color = "#bbb";
+      dateRow.style.fontSize = "13px";
+      dateRow.innerText = getCurrentDate();
+      chatMessages.appendChild(dateRow);
 
-promptInput.addEventListener('keydown', function(e) {
-if (e.key === 'Enter' && !e.shiftKey) {
-e.preventDefault();
-handleSubmit();
+      data.history.forEach(msg => {
+        // skip system role messages on UI
+        if(msg.role === "system") return;
+        createMessage(msg.content, msg.role === "user");
+      });
+    } else {
+      // fallback to just show date line
+      const dateRow = document.createElement('div');
+      dateRow.style.textAlign = "center";
+      dateRow.style.margin = "10px 0 15px 0";
+      dateRow.style.color = "#bbb";
+      dateRow.style.fontSize = "13px";
+      dateRow.innerText = getCurrentDate();
+      chatMessages.appendChild(dateRow);
+    }
+  } catch (e) {
+    // Just show date line on error
+    const dateRow = document.createElement('div');
+    dateRow.style.textAlign = "center";
+    dateRow.style.margin = "10px 0 15px 0";
+    dateRow.style.color = "#bbb";
+    dateRow.style.fontSize = "13px";
+    dateRow.innerText = getCurrentDate();
+    chatMessages.appendChild(dateRow);
+  }
 }
+
+promptInput.addEventListener('input', function () {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 80) + 'px';
+});
+promptInput.addEventListener('keydown', function (e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    handleSubmit();
+  }
 });
 sendButton.addEventListener('click', handleSubmit);
-
-async function handleSubmit() {
-const prompt = promptInput.value.trim();
-if (!prompt) return;
-createMessage(prompt, true);
-promptInput.value = '';
-promptInput.style.height = 'auto';
-sendButton.disabled = true;
-showTyping();
-
-try {
-const response = await fetch(API_URL, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ message: prompt })
+closeBtn.addEventListener('click', async () => {
+  // Call backend reset session to clear history
+  try {
+    await fetch(RESET_URL, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (e) {
+    // ignore errors here
+  }
+  window.location.reload();
 });
 
-const data = await response.json();
-// Show bot response
-createMessage(data.response, false);
+async function handleSubmit() {
+  const prompt = promptInput.value.trim();
+  if (!prompt) return;
+  createMessage(prompt, true);
+  promptInput.value = '';
+  promptInput.style.height = 'auto';
+  sendButton.disabled = true;
+  showTyping();
 
-} catch (error) {
-createMessage('Sorry, there was an error connecting to the server.', false);
-} finally {
-sendButton.disabled = false;
-hideTyping();
-promptInput.focus();
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ message: prompt }),
+    });
+    const data = await response.json();
+
+    if (data.response) {
+      createMessage(data.response, false);
+    } else {
+      createMessage('Sorry, there was an error with the response.', false);
+    }
+  } catch (error) {
+    createMessage('Sorry, there was an error connecting to the server.', false);
+  } finally {
+    sendButton.disabled = false;
+    hideTyping();
+    promptInput.focus();
+  }
 }
-}
+
+// Init on page load: load chat history if available in session
+window.addEventListener('DOMContentLoaded', () => {
+  loadChatHistory();
+});
 </script>
+
 </body>
 </html>
